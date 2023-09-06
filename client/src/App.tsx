@@ -77,6 +77,21 @@ export const GET_CURRENT_USER = gql`
       avatarUrl
       reason
     }
+    trends {
+      ... on TopicTrend {
+        tweetCount
+        topic
+        quote {
+          title
+          imageUrl
+          description
+        }
+      }
+      ... on HashtagTrend {
+        tweetCount
+        hashtag
+      }
+    }
   }
 `;
 
@@ -85,7 +100,7 @@ const App: React.FC = () => {
   if (loading) return <p>Loading ...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!data) return <p>No data...</p>;
-  const { currentUser, suggestions =  [] } = data;
+  const { currentUser, suggestions = [], trends = [] } = data;
   // _FA_ favorites are nested ... flatten them
   const { favorites: rawFavorites } = currentUser;
   const favorites = (rawFavorites || [])
@@ -94,7 +109,7 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <LeftSidebar currentUser={ currentUser } />
+      <LeftSidebar currentUser={currentUser} />
       <Header currentUser={currentUser} />
 
       <div id="container" className="wrapper nav-closed">
@@ -102,7 +117,7 @@ const App: React.FC = () => {
           currentUserId={CURRENT_USER.id}
           currentUserFavorites={favorites}
         />
-        <RightBar trends={TRENDS} suggestions={suggestions} />
+        <RightBar trends={trends} suggestions={suggestions} />
       </div>
     </div>
   );
