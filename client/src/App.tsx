@@ -65,6 +65,11 @@ export const GET_CURRENT_USER = gql`
         followerCount
         followingCount
       }
+      favorites {
+        tweet {
+          id
+        }
+      }
     }
     suggestions {
       name
@@ -80,16 +85,16 @@ const App: React.FC = () => {
   if (loading) return <p>Loading ...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!data) return <p>No data...</p>;
-  const { currentUser, suggestions = [] } = data;
-
-  const { favorites: rawFavorites } = CURRENT_USER;
+  const { currentUser, suggestions =  [] } = data;
+  // _FA_ favorites are nested ... flatten them
+  const { favorites: rawFavorites } = currentUser;
   const favorites = (rawFavorites || [])
     .map((f) => f.tweet?.id)
     .filter(isDefined);
 
   return (
     <div>
-      <LeftSidebar currentUser={{ ...CURRENT_USER, ...currentUser }} />
+      <LeftSidebar currentUser={ currentUser } />
       <Header currentUser={currentUser} />
 
       <div id="container" className="wrapper nav-closed">

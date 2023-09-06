@@ -1,12 +1,25 @@
 
 import { Tweet } from "./resolvers-types.generated"
-import { DbTweet } from "./db"
+import { DbTweet , DbFavorite} from "./db"
+import { Favorite } from "./resolvers-types.generated"
+
+// _FA_ transforming from database objects to graphql object schema
 export const tweetTransform = (
   t: DbTweet
 ): Omit<Tweet, "author"> => {
   return {
     id: t.id,
     body: t.message,
+    createdAt: t.createdAt,
+    updatedAt: t.updatedAt,
+  }
+}
+
+export const favoriteTransform = (
+  t: DbFavorite
+): Omit<Favorite, "user" | "tweet"> => {
+  return {
+    id: t.id,
     createdAt: t.createdAt,
     updatedAt: t.updatedAt,
   }

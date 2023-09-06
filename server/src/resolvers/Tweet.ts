@@ -3,11 +3,14 @@ import { TweetResolvers } from "../resolvers-types.generated"
 const tweetTwitterResolver: TweetResolvers<TwitterResolverContext> =
   {
     author(tweet, _, { db, dbUserCache, dbTweetCache }) {
-      const dbTweet = dbTweetCache[tweet.id]
+      let dbTweet = dbTweetCache[tweet.id]
       if (!dbTweet)
-        throw new Error(
-          "Attempted to find Tweet.author, but the tweet was not found in dbTweetCache"
-        )
+        dbTweet = db.getTweetById(tweet.id)
+        dbTweetCache[tweet.id] = dbTweet;
+        console.warn( "Attempted to find Tweet.author, but the tweet was not found in dbTweetCache")
+        // throw new Error(
+        //   "Attempted to find Tweet.author, but the tweet was not found in dbTweetCache"
+        // )
       let dbUser = dbUserCache[dbTweet.userId]
       if (!dbUser) {
         dbUser = db.getUserById(dbTweet.userId)

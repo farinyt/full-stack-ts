@@ -1,15 +1,15 @@
+import { gql } from "@apollo/client";
 import {
-  faImage,
-  faFilm,
   faChartBar,
   faComment,
+  faFilm,
+  faImage,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as React from 'react';
-import {gql} from "@apollo/client"
-import {useCreateNewTweetMutation} from "./generated/graphql"
 import { GET_CURRENT_USER } from './App';
 import { GET_TIMELINE_TWEETS } from './Timeline';
+import { useCreateNewTweetMutation } from "./generated/graphql";
 
 export interface ComposePanelProps {
   currentUser: { id: string };
