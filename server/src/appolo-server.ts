@@ -31,7 +31,13 @@ export async function createApolloServer(
     }),
     // _FA - the context is being set to a function so it's recreated on each call
     // rather than being a static thing that gets shared
-    context: ():TwitterResolverContext => ({ db }),
+    context: ():TwitterResolverContext => (
+      {
+       db,
+       dbTweetCache: {},
+       dbTweetToFavoriteCountMap: {},
+       dbUserCache: {},
+     }),
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
     ],

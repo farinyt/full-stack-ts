@@ -4,6 +4,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -13,10 +14,22 @@ export type Scalars = {
   Float: number;
 };
 
+export type Mutation = {
+  __typename?: 'Mutation';
+  createTweet: Tweet;
+};
+
+
+export type MutationCreateTweetArgs = {
+  body: Scalars['String'];
+  userId: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   currentUser: User;
   suggestions: Array<Suggestion>;
+  tweets: Array<Tweet>;
 };
 
 export type Suggestion = {
@@ -27,6 +40,23 @@ export type Suggestion = {
   reason: Scalars['String'];
 };
 
+export type Tweet = {
+  __typename?: 'Tweet';
+  author?: Maybe<User>;
+  body: Scalars['String'];
+  createdAt: Scalars['String'];
+  id: Scalars['String'];
+  stats?: Maybe<TweetStats>;
+  updatedAt: Scalars['String'];
+};
+
+export type TweetStats = {
+  __typename?: 'TweetStats';
+  commentCount: Scalars['Int'];
+  favoriteCount: Scalars['Int'];
+  retweetCount: Scalars['Int'];
+};
+
 export type User = {
   __typename?: 'User';
   avatarUrl: Scalars['String'];
@@ -35,7 +65,15 @@ export type User = {
   handle: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
+  stats?: Maybe<UserStats>;
   updatedAt: Scalars['String'];
+};
+
+export type UserStats = {
+  __typename?: 'UserStats';
+  followerCount: Scalars['Int'];
+  followingCount: Scalars['Int'];
+  tweetCount: Scalars['Int'];
 };
 
 
@@ -108,24 +146,39 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
+  Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Suggestion: ResolverTypeWrapper<Suggestion>;
+  Tweet: ResolverTypeWrapper<Tweet>;
+  TweetStats: ResolverTypeWrapper<TweetStats>;
   User: ResolverTypeWrapper<User>;
+  UserStats: ResolverTypeWrapper<UserStats>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
+  Int: Scalars['Int'];
+  Mutation: {};
   Query: {};
   String: Scalars['String'];
   Suggestion: Suggestion;
+  Tweet: Tweet;
+  TweetStats: TweetStats;
   User: User;
+  UserStats: UserStats;
+};
+
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  createTweet?: Resolver<ResolversTypes['Tweet'], ParentType, ContextType, RequireFields<MutationCreateTweetArgs, 'body' | 'userId'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   suggestions?: Resolver<Array<ResolversTypes['Suggestion']>, ParentType, ContextType>;
+  tweets?: Resolver<Array<ResolversTypes['Tweet']>, ParentType, ContextType>;
 };
 
 export type SuggestionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Suggestion'] = ResolversParentTypes['Suggestion']> = {
@@ -136,6 +189,23 @@ export type SuggestionResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type TweetResolvers<ContextType = any, ParentType extends ResolversParentTypes['Tweet'] = ResolversParentTypes['Tweet']> = {
+  author?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  stats?: Resolver<Maybe<ResolversTypes['TweetStats']>, ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type TweetStatsResolvers<ContextType = any, ParentType extends ResolversParentTypes['TweetStats'] = ResolversParentTypes['TweetStats']> = {
+  commentCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  favoriteCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  retweetCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   avatarUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   coverUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -143,13 +213,25 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   handle?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  stats?: Resolver<Maybe<ResolversTypes['UserStats']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type UserStatsResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserStats'] = ResolversParentTypes['UserStats']> = {
+  followerCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  followingCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  tweetCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
+  Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Suggestion?: SuggestionResolvers<ContextType>;
+  Tweet?: TweetResolvers<ContextType>;
+  TweetStats?: TweetStatsResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserStats?: UserStatsResolvers<ContextType>;
 };
 
